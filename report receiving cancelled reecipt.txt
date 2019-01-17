@@ -1,0 +1,216 @@
+----------------------------------------------- for super 
+SELECT
+br.taxbranch_name_kh,
+count(CASE WHEN t.is_correct=0 THEN (total_rc) END) incorrect,
+count(CASE WHEN t.is_correct = 1 THEN  (total_rc) END) correct,
+br.taxbranch_id
+FROM
+(
+SELECT
+rc.receipt_code as total_rc,
+CASE WHEN rc.sys_type ='SAS' THEN c.taxbranch_id
+WHEN rc.sys_type='SME2' THEN b.taxbranch_id
+WHEN rc.sys_type='RIN' THEN ren_br.taxbranch_id
+ELSE '0000' END taxbranch_id,
+rc.is_correct
+FROM
+largetax.ltd_received_receipt_cancelled rc 
+INNER JOIN largetax.ltd_payment_master mas ON rc.receipt_code = mas.receipt_code
+LEFT  JOIN largetax.ltd_companyinfo c ON rc.ref_id = c.com_id AND rc.sys_type='SAS'
+LEFT  JOIN smetax.sme_business b ON rc.ref_id = b.business_id AND rc.sys_type='SME2'
+LEFT JOIN  proptax.ptt_map_owner_propcard mapo ON mapo.map_owner_id = rc.ref_id AND rc.sys_type='RIN'
+LEFT JOIN largetax.gdt_owners own ON own.owner_id = mapo.owner_id  
+LEFT JOIN largetax.ltd_addresses adr ON adr.address_id = own.address_id
+LEFT JOIN gdtusers.tax_branches ren_br ON (CASE WHEN adr.province_id !='PNP12' THEN ren_br.province_id  = adr.province_id
+WHEN adr.province_id ='PNP12' THEN ren_br.district_id = adr.district_id END) 
+WHERE
+to_char(rc.created_date, 'YYYY-MM-DD') >='2018-12-03'  --?
+AND to_char(rc.created_date,'YYYY-MM-DD') <='2018-12-03' --?
+AND rc.is_active=1
+--AND (c.taxbranch_id =? OR b.taxbranch_id =? OR ren_br.taxbranch_id=?)--?
+)t
+INNER JOIN gdtusers.tax_branches br on br.taxbranch_id = t.taxbranch_id
+GROUP BY
+br.taxbranch_name_kh,
+br.taxbranch_id
+---------------------------------------------------- click view by tax branch
+SELECT
+(o.firstname_kh || ' ' || o.lastname_kh) as off_name,
+count(CASE WHEN t.is_correct=0 THEN (total_rc) END) incorrect,
+count(CASE WHEN t.is_correct = 1 THEN  (total_rc) END) correct,
+o.officer_id
+FROM
+(
+SELECT
+rc.receipt_code as total_rc,
+CASE WHEN rc.sys_type ='SAS' THEN c.taxbranch_id
+WHEN rc.sys_type='SME2' THEN b.taxbranch_id
+WHEN rc.sys_type='RIN' THEN ren_br.taxbranch_id
+ELSE '0000' END taxbranch_id,
+rc.is_correct,
+rc.created_by
+FROM
+largetax.ltd_received_receipt_cancelled rc 
+INNER JOIN largetax.ltd_payment_master mas ON rc.receipt_code = mas.receipt_code
+LEFT  JOIN largetax.ltd_companyinfo c ON rc.ref_id = c.com_id AND rc.sys_type='SAS'
+LEFT  JOIN smetax.sme_business b ON rc.ref_id = b.business_id AND rc.sys_type='SME2'
+LEFT JOIN  proptax.ptt_map_owner_propcard mapo ON mapo.map_owner_id = rc.ref_id AND rc.sys_type='RIN'
+LEFT JOIN largetax.gdt_owners own ON own.owner_id = mapo.owner_id  
+LEFT JOIN largetax.ltd_addresses adr ON adr.address_id = own.address_id
+LEFT JOIN gdtusers.tax_branches ren_br ON (CASE WHEN adr.province_id !='PNP12' THEN ren_br.province_id  = adr.province_id
+WHEN adr.province_id ='PNP12' THEN ren_br.district_id = adr.district_id END) 
+WHERE
+to_char(rc.created_date, 'YYYY-MM-DD') >='2018-12-03'  --?
+AND to_char(rc.created_date,'YYYY-MM-DD') <='2018-12-03' --?
+AND rc.is_active=1
+AND (c.taxbranch_id =? OR b.taxbranch_id =? OR ren_br.taxbranch_id=?)--?
+)t
+INNER JOIN gdtusers.tax_officers as o ON o.officer_id = t.created_by
+GROUP BY
+o.firstname_kh,
+o.lastname_kh,
+o.officer_id
+--------------------------------------------------- When click on officer name
+SELECT
+t.*,
+br.taxbranch_name_kh,
+(o.firstname_kh || ' ' || o.lastname_kh) o_name
+FROM
+(
+SELECT
+rc.receipt_code as total_rc,
+CASE WHEN rc.sys_type ='SAS' THEN c.taxbranch_id
+WHEN rc.sys_type='SME2' THEN b.taxbranch_id
+WHEN rc.sys_type='RIN' THEN ren_br.taxbranch_id
+ELSE '0000' END taxbranch_id,
+rc.is_correct,
+rc.created_by,
+CASE WHEN rc.sys_type ='SAS' THEN c.com_tin
+WHEN rc.sys_type='SME2' THEN b.business_tin
+WHEN rc.sys_type='RIN' THEN mapo.pro_card
+ELSE '0000' END c_tin,
+CASE WHEN rc.sys_type ='SAS' THEN c.com_name_kh
+WHEN rc.sys_type='SME2' THEN b.business_name_kh
+WHEN rc.sys_type='RIN' THEN (own.first_name_kh || ' ' || own.last_name_kh)
+ELSE '0000' END c_namekh,
+CASE WHEN rc.sys_type ='SAS' THEN c.com_name_en
+WHEN rc.sys_type='SME2' THEN b.business_name_en
+WHEN rc.sys_type='RIN' THEN (own.first_name_en || ' ' || own.last_name_en)
+ELSE '0000' END c_nameen,
+rc.reason,
+rc.is_cancelled
+FROM
+largetax.ltd_received_receipt_cancelled rc 
+INNER JOIN largetax.ltd_payment_master mas ON rc.receipt_code = mas.receipt_code
+LEFT  JOIN largetax.ltd_companyinfo c ON rc.ref_id = c.com_id AND rc.sys_type='SAS'
+LEFT  JOIN smetax.sme_business b ON rc.ref_id = b.business_id AND rc.sys_type='SME2'
+LEFT JOIN  proptax.ptt_map_owner_propcard mapo ON mapo.map_owner_id = rc.ref_id AND rc.sys_type='RIN'
+LEFT JOIN largetax.gdt_owners own ON own.owner_id = mapo.owner_id  
+LEFT JOIN largetax.ltd_addresses adr ON adr.address_id = own.address_id
+LEFT JOIN gdtusers.tax_branches ren_br ON (CASE WHEN adr.province_id !='PNP12' THEN ren_br.province_id  = adr.province_id
+WHEN adr.province_id ='PNP12' THEN ren_br.district_id = adr.district_id END) 
+WHERE
+to_char(rc.created_date, 'YYYY-MM-DD') >='2018-12-03'  
+AND to_char(rc.created_date,'YYYY-MM-DD') <='2018-12-03' 
+AND rc.is_active=1
+AND (c.taxbranch_id =2014001 OR b.taxbranch_id =2014001 OR ren_br.taxbranch_id=2014001)--?
+)t
+INNER JOIN gdtusers.tax_branches br ON br.taxbranch_id = t.taxbranch_id
+INNER JOIN gdtusers.tax_officers o ON o.officer_id = t.created_by
+--------------------------------------------------------------------------- click on incorrect and correct by tax branch(50 first sql)
+SELECT
+t.*,
+br.taxbranch_name_kh,
+(o.firstname_kh || ' ' || o.lastname_kh) o_name
+FROM
+(
+SELECT
+rc.receipt_code as total_rc,
+CASE WHEN rc.sys_type ='SAS' THEN c.taxbranch_id
+WHEN rc.sys_type='SME2' THEN b.taxbranch_id
+WHEN rc.sys_type='RIN' THEN ren_br.taxbranch_id
+ELSE '0000' END taxbranch_id,
+rc.is_correct,
+rc.created_by,
+CASE WHEN rc.sys_type ='SAS' THEN c.com_tin
+WHEN rc.sys_type='SME2' THEN b.business_tin
+WHEN rc.sys_type='RIN' THEN mapo.pro_card
+ELSE '0000' END c_tin,
+CASE WHEN rc.sys_type ='SAS' THEN c.com_name_kh
+WHEN rc.sys_type='SME2' THEN b.business_name_kh
+WHEN rc.sys_type='RIN' THEN (own.first_name_kh || ' ' || own.last_name_kh)
+ELSE '0000' END c_namekh,
+CASE WHEN rc.sys_type ='SAS' THEN c.com_name_en
+WHEN rc.sys_type='SME2' THEN b.business_name_en
+WHEN rc.sys_type='RIN' THEN (own.first_name_en || ' ' || own.last_name_en)
+ELSE '0000' END c_nameen,
+rc.reason,
+rc.is_cancelled
+FROM
+largetax.ltd_received_receipt_cancelled rc 
+INNER JOIN largetax.ltd_payment_master mas ON rc.receipt_code = mas.receipt_code
+LEFT  JOIN largetax.ltd_companyinfo c ON rc.ref_id = c.com_id AND rc.sys_type='SAS'
+LEFT  JOIN smetax.sme_business b ON rc.ref_id = b.business_id AND rc.sys_type='SME2'
+LEFT JOIN  proptax.ptt_map_owner_propcard mapo ON mapo.map_owner_id = rc.ref_id AND rc.sys_type='RIN'
+LEFT JOIN largetax.gdt_owners own ON own.owner_id = mapo.owner_id  
+LEFT JOIN largetax.ltd_addresses adr ON adr.address_id = own.address_id
+LEFT JOIN gdtusers.tax_branches ren_br ON (CASE WHEN adr.province_id !='PNP12' THEN ren_br.province_id  = adr.province_id
+WHEN adr.province_id ='PNP12' THEN ren_br.district_id = adr.district_id END) 
+WHERE
+to_char(rc.created_date, 'YYYY-MM-DD') >=?  
+AND to_char(rc.created_date,'YYYY-MM-DD') <=? 
+AND rc.is_active=1
+AND (c.taxbranch_id =2014001 OR b.taxbranch_id =2014001 OR ren_br.taxbranch_id=2014001) --?
+)t
+INNER JOIN gdtusers.tax_branches br ON br.taxbranch_id = t.taxbranch_id
+INNER JOIN gdtusers.tax_officers o ON o.officer_id = t.created_by
+
+--------------------------------------------------------------------------- click on incorrect and correct by tax branch + officer id(50 second sql)
+SELECT
+t.*,
+br.taxbranch_name_kh,
+(o.firstname_kh || ' ' || o.lastname_kh) o_name
+FROM
+(
+SELECT
+rc.receipt_code as total_rc,
+CASE WHEN rc.sys_type ='SAS' THEN c.taxbranch_id
+WHEN rc.sys_type='SME2' THEN b.taxbranch_id
+WHEN rc.sys_type='RIN' THEN ren_br.taxbranch_id
+ELSE '0000' END taxbranch_id,
+rc.is_correct,
+rc.created_by,
+CASE WHEN rc.sys_type ='SAS' THEN c.com_tin
+WHEN rc.sys_type='SME2' THEN b.business_tin
+WHEN rc.sys_type='RIN' THEN mapo.pro_card
+ELSE '0000' END c_tin,
+CASE WHEN rc.sys_type ='SAS' THEN c.com_name_kh
+WHEN rc.sys_type='SME2' THEN b.business_name_kh
+WHEN rc.sys_type='RIN' THEN (own.first_name_kh || ' ' || own.last_name_kh)
+ELSE '0000' END c_namekh,
+CASE WHEN rc.sys_type ='SAS' THEN c.com_name_en
+WHEN rc.sys_type='SME2' THEN b.business_name_en
+WHEN rc.sys_type='RIN' THEN (own.first_name_en || ' ' || own.last_name_en)
+ELSE '0000' END c_nameen,
+rc.reason,
+rc.is_cancelled
+FROM
+largetax.ltd_received_receipt_cancelled rc 
+INNER JOIN largetax.ltd_payment_master mas ON rc.receipt_code = mas.receipt_code
+LEFT  JOIN largetax.ltd_companyinfo c ON rc.ref_id = c.com_id AND rc.sys_type='SAS'
+LEFT  JOIN smetax.sme_business b ON rc.ref_id = b.business_id AND rc.sys_type='SME2'
+LEFT JOIN  proptax.ptt_map_owner_propcard mapo ON mapo.map_owner_id = rc.ref_id AND rc.sys_type='RIN'
+LEFT JOIN largetax.gdt_owners own ON own.owner_id = mapo.owner_id  
+LEFT JOIN largetax.ltd_addresses adr ON adr.address_id = own.address_id
+LEFT JOIN gdtusers.tax_branches ren_br ON (CASE WHEN adr.province_id !='PNP12' THEN ren_br.province_id  = adr.province_id
+WHEN adr.province_id ='PNP12' THEN ren_br.district_id = adr.district_id END) 
+WHERE
+to_char(rc.created_date, 'YYYY-MM-DD') >=?  
+AND to_char(rc.created_date,'YYYY-MM-DD') <=? 
+AND rc.is_active=1
+AND (c.taxbranch_id =2014001 OR b.taxbranch_id =2014001 OR ren_br.taxbranch_id=2014001) --?
+AND rc.is_correct=1 --?
+AND rc.created_by=5786 --?
+)t
+INNER JOIN gdtusers.tax_branches br ON br.taxbranch_id = t.taxbranch_id
+INNER JOIN gdtusers.tax_officers o ON o.officer_id = t.created_by
