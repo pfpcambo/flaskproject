@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Page Layout Using CSS Float</title>
+    <style>
+        body
+        {
+            margin:0px;
+            padding:0px;
+            border-color:black;
+        }
+
+        #header
+        {
+            background-color:red;
+            margin:0px;
+            padding:0px;
+            clear:both;
+        }
+
+        #footer
+        {
+            background-color:red;
+            margin:0px;
+            padding:0px;
+            clear:both;
+        }
+        #aside
+        {
+            background-color:blue;
+            margin:0px;
+            padding:20px;
+            float:left;
+        }
+        #section
+        {
+            background-color:yellow;
+            margin:0px;
+            padding:0px;
+            clear:right;
+
+        }
+         #article
+        {
+            background-color:green;
+            margin:0px;
+            padding:0px;
+
+        }
+       #content
+        {
+            background-color:gray;
+            margin:0px;
+            padding:0px;
+            padding-left:10px;
+            float:left;
+        }
+    </style>
+</head>
+<body>
+<div id="header">
+    <center>
+    <h2 style="margin:0px;padding:0px;">
+        This is Header
+    </h2>
+    </center>
+</div>
+
+
+    <div id="aside">
+    <ul style="margin:0px;padding:0px;">
+       <li>Menu 1</li>
+        <li>Menu 2</li>
+        <li>Menu 3</li>
+        <li>Menu 4</li>
+        <li>Menu 5</li>
+    </ul>
+    </div>
+
+    <div id="content">
+        <div id="section">
+            Section
+        </div>
+        <div id="article">
+            Article1. you can write any content of web site in hereArticle1.Article1. you can write any content of web site in hereArticle1 <br/>
+            Article1. you can write any content of web site in here<br/>
+            Article1. you can write any content of web site in here<br/>
+            Article1. you can write any content of web site in here<br/>
+            Article1. you can write any content of web site in here<br/>
+            Article1. you can write any content of web site in here<br/>
+            Article1. you can write any content of web site in here<br/>
+            Article1. you can write any content of web site in here<br/>
+            Article1. you can write any content of web site in here<br/>
+        </div>
+    </div>
+
+
+
+<div id="footer">
+    <center>
+    <h3 style="margin:0px;padding:0px;">This is Footer</h3>
+    </center>
+</div>
+
+</body>
+</html>

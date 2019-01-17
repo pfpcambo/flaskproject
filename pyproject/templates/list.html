@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student List</title>
+</head>
+<body>
+{% for message in get_flashed_messages() %}
+ {{ message }}
+{% endfor %}
+<hr/>
+<h2><a href = "{{ url_for('newstudent') }}">Add New Record</a></h2>
+<hr/>
+<table border = 1>
+         <thead>
+            <td>Student ID</td>
+            <td>Name</td>
+            <td>Address</td>
+            <td>city</td>
+            <td>Pincode</td>
+            <td colspan="2">Action</td>
+         </thead>
+
+         {% for student in students %}
+            <tr>
+               <td align="center">{{student.id}}</td>
+               <td>{{student.name}}</td>
+               <td>{{student.city}}</td>
+               <td> {{student.addr}}</td>
+               <td>{{student.pin}}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('editstudentform') }}" style="display: inline">
+                      <input type="hidden" value="{{student.id}}" name="sid">
+                      <input type="submit" value="Update">
+                    </form>
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('delstudent') }}" style="display: inline">
+                      <input type="hidden" value="{{student.id}}" name="sid">
+                      <input type="submit" value="Delete">
+                    </form>
+                </td>
+            </tr>
+         {% endfor %}
+      </table>
+
+      <a href = "/">Go back to home page</a>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Page</title>
+    <style>
+        img,div
+        {
+            padding:0px;
+            margin:0px;
+        }
+    </style>
+</head>
+<body>
+<h2>Marquee</h2>
+<div>
+     <marquee behavior="slide" bgcolor="red" hspace="20%">
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+     </marquee>
+</div>
+<h2>Floating Image</h2>
+<div>
+    <img src="imgs/img1.jpg" alt="Butter Fly" style="width:33%;height:100px;float:left;">
+    <img alt="Flower" src="imgs/img2.jpg" style="width:33%;height:100px;float:left;">
+    <img src="imgs/img3.jpg" alt="Bird" style="width:34%;height:100px;float:left;">
+    <img src="imgs/img4.jpg" alt="Bird" width="100%" usemap="#workmap">
+    <map name="workmap">
+        <area shape="rect" coords="34,44,270,350" alt="Computer" href="computer.htm" target="_blank">
+        <area shape="rect" coords="290,172,333,250" alt="Phone" href="phone.htm" target="_blank">
+        <area shape="circle" coords="337,300,44" alt="Coffee" href="coffee.htm" target="_blank">
+    </map>
+</div>
+
+<div style="background-image:url('imgs/img4.jpg');height:200px;">
+    Test Background Image.
+</div>
+
+<div>
+    <img src="imgs/img1.jpg" style="width:40px;height:40px;float:left;">
+    <p>
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+    </p>
+    <img src="imgs/img1.jpg" style="width:40px;height:40px;float:left;">
+    <p>
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+        I am the image here with any text that i want to test with images.
+    </p>
+</div>
+<div>
+    <picture>
+        <source media="(min-width:800px)" srcset="imgs/img2.jpg">
+        <source media="(min-width:600px)" srcset="imgs/img3.jpg">
+        <img src="imgs/img4.jpg" alt="Bird" style="width:100%">
+    </picture>
+</div>
+</body>
+</html>

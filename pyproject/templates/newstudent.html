@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Student</title>
+</head>
+<body>
+    <h2>Add Student</h2>
+    <hr>
+    {%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div>
+            {{ message }}
+         </div>
+    {%- endfor %}
+    <hr>
+    <form action = "{{ url_for('newstudent') }}" method = "POST">
+         <h3>Student Information</h3>
+         Name<br>
+         <input type = "text" name = "name" /></br>
+
+         Address<br>
+         <textarea name = "addr" ></textarea><br>
+
+         City<br>
+         <input type = "text" name = "city" /><br>
+
+         PINCODE<br>
+         <input type = "text" name = "pin" /><br>
+         <input type = "submit" value = "submit" /><br>
+    </form>
+
+</body>
+</html>
